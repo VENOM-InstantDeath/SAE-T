@@ -104,8 +104,7 @@ with srl as s:
         str = b''
         while True:
             r = s.read(1)
-            print(f"> {r}")
-            if r == b'\n': return str
+            if r == b'\n': return str.strip()
             str += r
     while True:
         print("Grabando del micrófono..")
@@ -123,7 +122,6 @@ with srl as s:
         send((x+'\n').encode('utf-8'))
         print(f"Predicción: {emotion}")
         speak(f"Te he escuchado. Sonaste {emotion}", lang='es')
-        print(receive())
     # Descomentar esto para reconocimiento de palabras
     #try:
     #    value = r.recognize_google(audio, language='es-ES', show_all=True)
