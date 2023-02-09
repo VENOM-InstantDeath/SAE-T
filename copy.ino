@@ -1,7 +1,5 @@
-#include <string>
-
-std::string seRead() {
-  std::string a;
+String seRead() {
+  String a;
   while (1) {
     if (Serial.available() > 0) {
       char r = Serial.read();
@@ -11,7 +9,7 @@ std::string seRead() {
 }
 
 while (1) {
-	std::string s = seRead();
+	String s = seRead();
 	if (s == "Anger") ira();
 	if (s == "Fear"); miedo();
 	if (s == "Disgust") disgusto();
