@@ -120,9 +120,10 @@ with srl as s:
         print("Prediciendo emociones..")  # Reconociendo emoción
         x = model.predict(features)[0]
         emotion = emotospanish(x)
-        send(x)
+        send((x+'\n').encode('utf-8'))
         print(f"Predicción: {emotion}")
         speak(f"Te he escuchado. Sonaste {emotion}", lang='es')
+        print(receive())
     # Descomentar esto para reconocimiento de palabras
     #try:
     #    value = r.recognize_google(audio, language='es-ES', show_all=True)
