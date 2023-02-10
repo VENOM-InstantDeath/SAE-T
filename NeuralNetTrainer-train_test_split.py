@@ -1,12 +1,12 @@
-import soundfile # to read audio file
+import soundfile
 import numpy as np
-import librosa # to extract speech features
+import librosa
 import glob
 import os
-import pickle # to save model after training
-from sklearn.model_selection import train_test_split # for splitting training and testing
-from sklearn.neural_network import MLPClassifier # multi-layer perceptron model
-from sklearn.metrics import accuracy_score # to measure how good we are
+import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score
 
 def extract_feature(file_name, **kwargs):
     mfcc = kwargs.get("mfcc")
@@ -37,55 +37,20 @@ def extract_feature(file_name, **kwargs):
             result = np.hstack((result, tonnetz))
     return result
 
-# all emotions on MESD dataset
-int2emotion = {
-    "01": "neutral",
-    "02": "happy",
-    "03": "sad",
-    "04": "angry",
-    "05": "fearful",
-    "06": "disgust",
-}
-
-# we allow only these emotions ( feel free to tune this on your need )
-AVAILABLE_EMOTIONS = {
-    "angry",
-    "sad",
-    "neutral",
-    "happy",
-    "disgust",
-    "fearful"
-}
-
 def load_data(test_size=0.2):
     X, y = [], []
     print(len(glob.glob('data/*.wav')))
     for file in glob.glob("data/*.wav"):
-        # get the base name of the audio file
         basename = os.path.basename(file)
-        # get the emotion label
         emotion = basename.split("_")[0]
-        # we allow only AVAILABLE_EMOTIONS we set ==> We accept every emotion.
-        #if emotion not in AVAILABLE_EMOTIONS:
-        #    continue
-        # extract speech features
         features = extract_feature(file, mfcc=True, chroma=True, mel=True)
-        # add to data
         X.append(features)
         y.append(emotion)
-    # split the data to training and testing and return it
     return train_test_split(np.array(X), y, test_size=test_size, random_state=7)
 
 X_train, X_test, y_train, y_test = load_data(test_size=0.25)
-# Mere logging coming ahead
-# print some details
-# number of samples in training data
 print("[+] Number of training samples:", X_train.shape[0])
-# number of samples in testing data
 print("[+] Number of testing samples:", X_test.shape[0])
-# number of features used
-# this is a vector of features extracted 
-# using extract_features() function
 print("[+] Number of features:", X_train.shape[1])
 
 # best model, determined by a grid search
@@ -98,24 +63,17 @@ model_params = {
     'max_iter': 500, 
 }
 
-# initialize Multi Layer Perceptron classifier
-# with best parameters ( so far )
 model = MLPClassifier(**model_params)
 
-# train the model
 print("[*] Training the model...")
 model.fit(X_train, y_train)
 
-# predict 25% of data to measure how good we are
 y_pred = model.predict(X_test)
 
-# calculate the accuracy
 accuracy = accuracy_score(y_true=y_test, y_pred=y_pred)
 
 print("Accuracy: {:.2f}%".format(accuracy*100))
 
-# now we save the model
-# make result directory if doesn't exist yet
 if not os.path.isdir("result"):
     os.mkdir("result")
 
