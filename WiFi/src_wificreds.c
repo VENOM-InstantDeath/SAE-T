@@ -82,7 +82,7 @@ int main() {
 			readcont(ssid, pass);
 			writeconf(ssid, pass);
 			interface_ctrl("wlan0", 0);
-			interface_ctrl("wlan0", 1);
+			system("systemctl restart dhcpcd");
 		}
 	}
 	closedir(d);
