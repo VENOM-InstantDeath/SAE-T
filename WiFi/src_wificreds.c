@@ -65,7 +65,7 @@ int main() {
 	while ((dir = readdir(d)) != NULL) {	
 		char* fname = dir->d_name;
 		int result;
-		if (!strncmp(fname, "sd", 2) && strncmp(fname, "sda", 3) && strlen(fname) == 4) {
+		if (!strncmp(fname, "sd", 2) && strlen(fname) == 4) {
 			printf("Checking for /dev/%s... ", fname);
 			result = checkforfile(fname);
 			switch(result) {
