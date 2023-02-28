@@ -3,7 +3,10 @@
 #include <dirent.h>
 #include <string.h>
 #include <unistd.h>
+#include <net/if.h>
 #include <sys/mount.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 
 /*/etc/mtab to get mountpoints of mounted partitions*/
 
@@ -29,6 +32,33 @@ void readcont(char* ssid, char* pass) {
 	fclose(f);
 }
 
+void writeconf(char* ssid, char* pass) {
+	/* <Example config>
+	ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+	update_config=1
+	network={
+	ssid="name"
+	psk="plain passw"
+	scan_ssid=1
+	key_mgmt=WPA-PSK
+	}
+	   <End Example>*/
+	char* confpath = "/etc/wpa_supplicant/wpa_supplicant.conf";
+	FILE* f = fopen(confpath, "w");
+	fprintf(f, "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev\nupdate_config=1\nnetwork={\nssid=\"%s\"\npsk=\"%s\"\nscan_ssid=1\nkey_mgmt=WPA-PSK\n}", ssid, pass);
+	fclose(f);
+}
+
+void interface_ctrl(char* interface, int mode) {
+	struct ifreq ifr;
+	strcpy(ifr.ifr_name, interface);
+	if (mode) ifr.ifr_flags = IFF_UP;
+	else ifr.ifr_flags = IFF_BROADCAST;
+	int fd = socket(AF_INET, SOCK_DGRAM, 0);
+	ioctl(fd, SIOCSIFFLAGS, &ifr);
+	perror("Ioctl");
+}
+
 int main() {
 	DIR *d = opendir("/dev/");
 	struct dirent *dir;
@@ -50,6 +80,9 @@ int main() {
 			char* ssid = calloc(33,1);
 			char* pass = calloc(33,1);
 			readcont(ssid, pass);
+			writeconf(ssid, pass);
+			interface_ctrl("wlan0", 0);
+			interface_ctrl("wlan0", 1);
 		}
 	}
 	closedir(d);
