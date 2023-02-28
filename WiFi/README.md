@@ -20,6 +20,6 @@ gcc src_wificreds -o /usr/bin/wificreds
 
 # Uso
 
-Esta utilidad intenta buscar en todas las particiones disponibles si se encuentra el archivo *"WIFI"* en el directorio raíz, el cual debe tener contener dos líneas: Una especificando el ssid de la red, y en la otra línea debe estar la contraseña.
+Esta utilidad intenta buscar en todas las particiones disponibles si se encuentra el archivo *"WIFI"* en el directorio raíz, el cual debe contener dos líneas: Una especificando el ssid de la red, y en la otra línea debe estar la contraseña.
 
 Este programa será llamado por SAE, pero si se desea probarlo, primero se debe conectar la usb y luego ejecutar el comando `wificreds` que ya estará disponible. Este programa debe ser ejecutado con permisos de superusuario. Tras ejecutarlo el proceso será automático.
