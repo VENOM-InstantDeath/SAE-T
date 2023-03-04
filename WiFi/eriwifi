@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+
+f = open("/mnt/WIFI", "w+")
+print("\033[1;31mAsistente de Eri enviado por Tomate\033[0m\n\n")
+ssid = input("SSID: ")
+passw = input("Contraseña: ")
+f.write(f"{ssid}\n{passw}\n")
+f.close()
