@@ -1,0 +1,11 @@
+[Unit]
+Description="SAE updater service"
+
+[Service]
+User=root
+WorkingDirectory="/home/pupet/SAE-T/updater/"
+ExecStart=/usr/bin/python3 sae-updater.py
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
