@@ -1,0 +1,18 @@
+pip3 {
+	librosa
+	numpy
+	wave
+	soundfile
+	sounddevice
+	speechrecognition
+	pyserial
+	gtts
+	scikit-learn	
+}
+
+apt {
+	ffmpeg
+	pulseaudio
+	pulsemixer
+	alsa-utils
+}
