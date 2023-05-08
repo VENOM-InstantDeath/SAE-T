@@ -35,6 +35,7 @@ int add(WINDOW* mwin, int* mdata, void* data) {
 	WINDOW* stdscr = (WINDOW*)data;
 	int y, x; getmaxyx(stdscr, y, x);
 	WINDOW* win = newwin(5,20, y/2-2, x/2-10);
+	keypad(win, 1);
 	int wy,wx; getmaxyx(win, y,x);
 	wbkgd(win, COLOR_PAIR(3));
 	mvwaddstr(win, 0, x/2-strlen(emo[mdata[1]])/2, emo[mdata[1]]);
@@ -66,7 +67,10 @@ int add(WINDOW* mwin, int* mdata, void* data) {
 	fwrite(fstr, 1, strlen(fstr), conf);
 	fclose(conf);
 	delwin(win);
-	free(str);free(jobj);free(val);free(ptr);
+	free(str);
+	free(jobj);
+	free(val);
+	free(ptr);
 	touchwin(stdscr);wrefresh(stdscr);
 	return 1;
 }

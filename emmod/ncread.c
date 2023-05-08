@@ -49,7 +49,7 @@ int ampsread(WINDOW* win, char** ptr, int y, int x, int vislim, int chlim, int m
 		if (ch == 127) ch = KEY_BACKSPACE;
 		else if (ch == 8) ch = KEY_BACKSPACE;
 		if (ch == 4) {}
-		if (ch == 27) {ptr = NULL;return 1;}
+		if (ch == 27) {*ptr = NULL; return 1;}
 		if (ch == '\n') {*ptr = listostr(String);return 0;}
 		if (ch == KEY_BACKSPACE) {
 			if (!sp) continue;
