@@ -45,6 +45,7 @@ def emotospanish(str):
     return d[str]
 
 def speak(str, lang):
+    if not str: return
     x=gTTS(str, lang=lang)
     f=BytesIO(list(x.stream())[0])
     AudioSegment.from_mp3(f).export(f, format="wav")
@@ -123,7 +124,7 @@ with srl as s:
         print("Prediciendo emociones..")  # Reconociendo emoción
         x = model.predict(features)[0]
         emotion = emotospanish(x)
-        #send((x+'\n').encode('utf-8'))
+        send((x+'\n').encode('utf-8'))
         print(f"Predicción: {emotion}")
         speak(f"Te he escuchado. Sonaste {emotion}", lang='es')
         # Descomentar esto para reconocimiento de palabras
