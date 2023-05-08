@@ -18,18 +18,21 @@ int checkforfile(char* fname) {
 	return 0;
 }
 
-void readcont(char* ssid, char* pass) {
+int readcont(char* ssid, char* pass) {
 	FILE* f = fopen("/mnt/WIFI", "r");
 	int c = 0;
 	char ch;
 	while ((ch = fgetc(f)) != '\n') {
+		if (ch == EOF) return 1;
 		ssid[c] = ch; c++;
 	}
 	c = 0;
 	while ((ch = fgetc(f)) != '\n') {
+		if (ch == EOF) return 1;
 		pass[c] = ch; c++;
 	}
 	fclose(f);
+	return 0;
 }
 
 void writeconf(char* ssid, char* pass) {
@@ -60,6 +63,12 @@ void interface_ctrl(char* interface, int mode) {
 }
 
 int main() {
+	/*Error codes
+	 * 1. Not root
+	 * 2. WIFI file: Wrong format*/
+	if (getuid()) {
+		return 1;
+	}
 	DIR *d = opendir("/dev/");
 	struct dirent *dir;
 	while ((dir = readdir(d)) != NULL) {	
@@ -79,7 +88,7 @@ int main() {
 			printf("Reading file content...\n");
 			char* ssid = calloc(33,1);
 			char* pass = calloc(33,1);
-			readcont(ssid, pass);
+			if (readcont(ssid, pass)) return 2;
 			writeconf(ssid, pass);
 			interface_ctrl("wlan0", 0);
 			system("systemctl restart dhcpcd");
