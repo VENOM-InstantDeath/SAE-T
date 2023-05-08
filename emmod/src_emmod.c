@@ -44,7 +44,7 @@ int add(WINDOW* mwin, int* mdata, void* data) {
 	char* ptr;
 	ampsread(win, &ptr, 2, 1, 17, 50, 0, 2);
 	if (ptr == NULL) return 1;
-	FILE* conf = fopen("emotion.json", "r");
+	FILE* conf = fopen("/etc/emotion.json", "r");
 	fseek(conf, 0, SEEK_END);
 	int size = ftell(conf);
 	fseek(conf, 0, SEEK_SET);
@@ -63,7 +63,7 @@ int add(WINDOW* mwin, int* mdata, void* data) {
 	json_object_object_get_ex(val, emo[mdata[1]], &val);
 	json_object_object_add(jobj, emo[mdata[1]], val);
 	const char* fstr = json_object_to_json_string(jobj);
-	conf = fopen("emotion.json", "w");
+	conf = fopen("/etc/emotion.json", "w");
 	fwrite(fstr, 1, strlen(fstr), conf);
 	fclose(conf);
 	delwin(win);
