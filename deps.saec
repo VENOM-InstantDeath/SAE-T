@@ -16,3 +16,13 @@ apt {
 	pulsemixer
 	alsa-utils
 }
+
+install {
+	pip install --yes %
+	apt update;apt install --yes %
+}
+
+check {
+	pip list %
+	apt list % --installed | grep %
+}
