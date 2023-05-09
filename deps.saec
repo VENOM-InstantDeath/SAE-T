@@ -7,7 +7,9 @@ pip3 {
 	speechrecognition
 	pyserial
 	gtts
-	scikit-learn	
+	scikit-learn
+	pandas
+	systemd-python
 }
 
 apt {
@@ -18,11 +20,11 @@ apt {
 }
 
 install {
-	pip install --yes %
-	apt update;apt install --yes %
+	pip3: pip3 install %
+	apt: apt update;apt install --yes %
 }
 
 check {
-	pip list %
-	apt list % --installed | grep %
+	pip3: pip3 show %
+	apt: apt list % --installed | grep %
 }
