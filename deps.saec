@@ -8,7 +8,6 @@ pip3 {
 	pyserial
 	gtts
 	scikit-learn
-	pandas
 	systemd-python
 }
 
