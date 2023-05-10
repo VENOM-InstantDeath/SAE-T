@@ -11,6 +11,7 @@ import soundfile as sf
 import sounddevice as sd
 import curses
 import locale
+import socket
 from gtts import gTTS
 from ctypes import *
 from pydub import AudioSegment
@@ -87,16 +88,32 @@ def extract_feature(file_name, **kwargs):
             result = np.hstack((result, tonnetz))
     return result.reshape(1,-1)
 
+def ssh(w1):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    ip = socket.gethostbyname(socket.gethostname())
+    if ip == '127.0.0.1':
+        speak("No puedo iniciar SSH, necesito conectarme a internet.", w1, lang='es')
+        return
+    pr = Popen(("systemctl", "status", "sshd"), stdout=PIPE, stderr=PIPE)
+    pr.wait()
+    if pr.returncode:
+        pr = Popen(("sudo", "systemctl", "start", "sshd"), stdout=PIPE, stderr=PIPE)
+        pr.wait()
+    speak(f"Listo, ya inicié ssh, mi IP es {ip}", w1, lang='es')
+
 
 def wifi(w1):
-    pr = Popen(("sudo wificreds"))
+    pr = Popen(("sudo", "wificreds"), stdout=PIPE, stderr=PIPE)
+    pr.wait()
     if pr.returncode == 1:
         speak("No he podido conectarme a la red, no tengo permisos suficientes.", w1, lang="es")
     elif pr.returncode == 2:
         speak("No he podido conectarme a la red, el archivo WiFi en la USB tiene un formato incorrecto. No podré usarlo.", w1, lang="es")
     else:
-        # Chequear conexión de internet antes de afirmar. TODO
-        speak("Listo, ya estoy en línea", w1, lang="es")
+        if socket.gethostbyname(socket.gethostname()) == '127.0.0.1':
+            speak("Ocurrió un error. No puedo conectarme a la red.", w1, lang="es")
+        else:
+            speak("Listo, ya estoy en línea", w1, lang="es")
 
 def quit(w1):
     speak("Hasta luego", w1, lang="es");exit(0)
@@ -108,7 +125,8 @@ ANS = {
         "chao": [quit, ""],
         "chau, sae": [quit, ""],
         "adiós": [quit, ""],
-        "conéctate a wi-fi": [wifi, "Claro, dame un momento"]
+        "conéctate a wi-fi": [wifi, "Claro, dame un momento"],
+        "activa el ssh": [ssh, "Claro, dame un momento"]
         }
 
 EMO = json.load(open("emotion.json"))
@@ -165,7 +183,7 @@ def main(stdscr):
     w2.write("Iniciando Serial..")
     srl = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
     curses.napms(2000)
-    w2.writeln(f"OK")
+    w2.writeln("OK")
     w2.write("Cargando modelo...")
     F = open('neural_network/mlp_classifier.model-all', 'rb')
     model = pickle.load(F)
@@ -201,15 +219,14 @@ def main(stdscr):
             x = model.predict(features)[0]
             emotion = emotospanish(x)
             send((x+'\n').encode('utf-8'))
-            # Descomentar esto para reconocimiento de palabras
             try:
                 value = r.recognize_google(audio, language='es-ES', show_all=True)
                 result = value['alternative'][0]['transcript'].lower()
                 w1.writeln(f"Tú ({x}): {result}")
                 if ANS.get(result):
                     obj = ANS.get(result)
-                    if obj[0]: obj[0](w1)
                     speak(obj[1], w1, lang="es")
+                    if obj[0]: obj[0](w1)
                 else:
                     speak(EMO[x], w1, lang="es")
             except sr.UnknownValueError:
@@ -222,7 +239,7 @@ def main(stdscr):
                 w2.eraseline()
                 continue
             w2.eraseline()
-
+    
 if __name__ == "__main__":
     curses.wrapper(main)
 
