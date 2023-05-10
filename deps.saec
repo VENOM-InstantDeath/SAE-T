@@ -6,6 +6,8 @@ pip3 {
 	sounddevice
 	speechrecognition
 	pyserial
+	pydub
+	pyaudio
 	gtts
 	scikit-learn
 	systemd-python
