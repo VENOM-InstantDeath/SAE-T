@@ -62,7 +62,7 @@ def parse(str):
 
 os.chdir(f"/home/darth/Programming/Erika/SAE/SAE-T")
 subprocess.Popen(("git", "pull"), stdout=subprocess.PIPE)
-F = open("deps.saec")
+F = open("../deps.saec")
 DEPS = parse(F.read())
 F.close()
 if DEPS:
