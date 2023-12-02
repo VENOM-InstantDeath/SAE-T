@@ -9,18 +9,20 @@ C=0
 AUDIO=[]
 def play():
     global C
+    if C >= len(AUDIO): return
+    print(C)
+    print(AUDIO[C])
     sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
     sd.wait()
     C+=1
 
 def main():
-    AUDIO = []
     l=os.listdir('audio');l.sort()
     bt = Button(26)
     for i in sorted(os.listdir('audio')):
         data,fs=sf.read(f'audio/{i}', dtype='float32')
         AUDIO.append({'data': data, 'fs': fs})
-    bt.when_pressed(play)
+    bt.when_pressed = play
     pause()
 
 if __name__=='__main__':

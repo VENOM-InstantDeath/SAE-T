@@ -15,8 +15,9 @@ def main():
     for i in range(len(data)):
         if (len(data[i]) <= 100):
             obj = gTTS(data[i], lang='es')
-            F = open(f"audio/{i}.mp3", 'wb+')
-            F.write(list(obj.stream())[0])
+            F = open(f"audio/{i}.wav", 'wb+')
+            audio=AudioSegment.from_mp3(BytesIO(list(obj.stream())[0]))
+            audio.export(f"audio/{i}.wav", format='wav')
             F.close()
         else:
             c=0
@@ -39,7 +40,7 @@ def main():
                     objL = AudioSegment.from_file(obj)
                 else:
                     objL += AudioSegment.from_file(obj)
-            objL.export(f"audio/{i}.mp3", format='mp3')
+            objL.export(f"audio/{i}.wav", format='wav')
 
 if __name__=='__main__':
     main()
