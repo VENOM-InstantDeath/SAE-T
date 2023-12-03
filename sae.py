@@ -13,9 +13,11 @@ import curses
 import locale
 import socket
 from gtts import gTTS
+from TTS.api import TTS
 from ctypes import *
 from pydub import AudioSegment
 from sklearn.neural_network import MLPClassifier
+from vosk import SetLogLevel, Model, KaldiRecognizer
 from io import BytesIO
 from time import sleep
 from sys import argv, stdout
@@ -51,9 +53,14 @@ def emotospanish(str):
 def speak(str, w1, lang):
     if not str: return
     w1.writeln(f"SAE: {str}")
-    x=gTTS(str, lang=lang)
-    f=BytesIO(list(x.stream())[0])
-    AudioSegment.from_mp3(f).export(f, format="wav")
+    ip = socket.gethostbyname(socket.gethostname())
+    if ip.startswith('127.0.'):
+        f = BytesIO()
+        noecho();tts.tts_to_file(text=str, file_path=f);echo()
+    else:
+        x=gTTS(str, lang=lang)
+        f=BytesIO(list(x.stream())[0])
+        AudioSegment.from_mp3(f).export(f, format="wav")
     data,fs=sf.read(f, dtype='float32')
     sd.play(data,fs)
     sd.wait()
@@ -89,9 +96,8 @@ def extract_feature(file_name, **kwargs):
     return result.reshape(1,-1)
 
 def ssh(w1):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ip = socket.gethostbyname(socket.gethostname())
-    if ip == '127.0.0.1':
+    if ip.startswith('127.0.'):
         speak("No puedo iniciar SSH, necesito conectarme a internet.", w1, lang='es')
         return
     pr = Popen(("systemctl", "status", "sshd"), stdout=PIPE, stderr=PIPE)
@@ -101,6 +107,12 @@ def ssh(w1):
         pr.wait()
     speak(f"Listo, ya inicié ssh, mi IP es {ip}", w1, lang='es')
 
+def ip(w1):
+    ip = socket.gethostbyname(socket.gethostname())
+    if ip.startswith('127.0.'):
+        speak("No estoy conectada a la red, así que no tengo una IP disponible.", w1, lang='es')
+    else:
+        speak(f"Tu IP es {ip}", w1, lang='es')
 
 def wifi(w1):
     pr = Popen(("sudo", "wificreds"), stdout=PIPE, stderr=PIPE)
@@ -110,7 +122,7 @@ def wifi(w1):
     elif pr.returncode == 2:
         speak("No he podido conectarme a la red, el archivo WiFi en la USB tiene un formato incorrecto. No podré usarlo.", w1, lang="es")
     else:
-        if socket.gethostbyname(socket.gethostname()) == '127.0.0.1':
+        if socket.gethostbyname(socket.gethostname()).startswith('127.0.'):
             speak("Ocurrió un error. No puedo conectarme a la red.", w1, lang="es")
         else:
             speak("Listo, ya estoy en línea", w1, lang="es")
@@ -119,14 +131,15 @@ def quit(w1):
     speak("Hasta luego", w1, lang="es");exit(0)
 
 ANS = {
-        "hola": [None,"¡Hola! ¿Cómo estás?"],
-        "hola sae": [None, "¡Hola! ¿Cómo estás?"],
+        "hola": [None,"Hola! Cómo estás?"],
+        "hola sae": [None, "Hola! Cómo estás?"],
         "chau": [quit, ""],
         "chao": [quit, ""],
         "chau, sae": [quit, ""],
         "adiós": [quit, ""],
         "conéctate a wi-fi": [wifi, "Claro, dame un momento"],
-        "activa el ssh": [ssh, "Claro, dame un momento"]
+        "activa el acceso remoto": [ssh, "Claro, dame un momento"],
+        "cual es tu direccion": [ip, ""]
         }
 
 EMO = json.load(open("emotion.json"))
@@ -220,8 +233,21 @@ def main(stdscr):
             emotion = emotospanish(x)
             send((x+'\n').encode('utf-8'))
             try:
-                value = r.recognize_google(audio, language='es-ES', show_all=True)
-                result = value['alternative'][0]['transcript'].lower()
+                if socket.gethostbyname(socket.gethostname()).startswith('127.0.'):
+                    wav = BytesIO(audio.get_wav_data())
+                    wav = wave.open(wav, 'rb')
+                    vmodel = Model(lang='es')
+                    rec = KaldiRecognizer(vmodel, wav.getframerate())
+                    rec.SetWords(True)
+                    rec.SetPartialWords(True)
+                    while True:
+                        data = wav.readframes(4000)
+                        if not len(data): break
+                        rec.AcceptWaveform(data)
+                    result = json.loads(rec.FinalResult())['text'].lower()
+                else:
+                    value = r.recognize_google(audio, language='es-ES', show_all=True)
+                    result = value['alternative'][0]['transcript'].lower()
                 w1.writeln(f"Tú ({x}): {result}")
                 if ANS.get(result):
                     obj = ANS.get(result)
@@ -241,5 +267,7 @@ def main(stdscr):
             w2.eraseline()
     
 if __name__ == "__main__":
+    SetLogLevel(-1)
+    noecho();tts = TTS(TTS.list_models()[22]);echo()
     curses.wrapper(main)
 

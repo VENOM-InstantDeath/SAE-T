@@ -1,5 +1,6 @@
 import soundfile as sf
 import sounddevice as sd
+import serial
 import os
 from pydub import AudioSegment
 from gpiozero import Button
@@ -7,13 +8,17 @@ from signal import pause
 
 C=0
 AUDIO=[]
+SRL = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
+
 def play():
     global C
-    if C >= len(AUDIO): return
-    print(C)
-    print(AUDIO[C])
-    sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
-    sd.wait()
+    if C == len(AUDIO):
+        C = 0
+        return
+    with srl as s:
+        s.write(b'next')
+        sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
+        sd.wait()
     C+=1
 
 def main():
