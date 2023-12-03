@@ -8,7 +8,7 @@ from signal import pause
 
 C=0
 AUDIO=[]
-SRL = serial.Serial(port='/dev/ttyUSB0', baudrate=9600)
+SRL = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
 
 def play():
     global C
