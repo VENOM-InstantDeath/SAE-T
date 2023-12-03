@@ -88,7 +88,7 @@ String seRead() {
 }
 
 typedef void (*Dialogo)(void);
-int c = 0;
+int diagc = 0;
 Dialogo funcs[] = {dialogo1, dialogo2, dialogo3,
                   dialogo4, dialogo5, dialogo6};
 
@@ -104,7 +104,7 @@ void setup() {
 void loop() {
   String s = seRead();
   if (s == "next") {
-    funcs[c]();
-    c++;
+    funcs[diagc]();
+    diagc++;
   }
 }
