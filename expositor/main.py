@@ -11,6 +11,7 @@ AUDIO=[]
 SRL = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
 
 def play():
+    print("Button was pressed!!")
     global C
     if C == len(AUDIO):
         C = 0
@@ -22,12 +23,15 @@ def play():
     C+=1
 
 def main():
+    print("Program started")
     l=os.listdir('audio');l.sort()
     bt = Button(26)
+    print("Button detected")
     for i in sorted(os.listdir('audio')):
         data,fs=sf.read(f'audio/{i}', dtype='float32')
         AUDIO.append({'data': data, 'fs': fs})
     bt.when_pressed = play
+    print("Ready")
     pause()
 
 if __name__=='__main__':
