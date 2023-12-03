@@ -16,7 +16,7 @@ def play():
     if C == len(AUDIO):
         C = 0
         return
-    with srl as s:
+    with SRL as s:
         s.write(b'next')
         sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
         sd.wait()
