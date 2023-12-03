@@ -17,7 +17,7 @@ def play():
         C = 0
         return
     with SRL as s:
-        s.write(b'next')
+        s.write(b'next\n')
         sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
         sd.wait()
     C+=1
