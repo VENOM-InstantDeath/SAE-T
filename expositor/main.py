@@ -32,8 +32,9 @@ def main():
         AUDIO.append({'data': data, 'fs': fs})
     print("Ready")
     with SRL as s:
-        if bt.is_pressed: play(s)
-        sleep(0.2)
+        while 1:
+            if bt.is_pressed: play(s)
+            sleep(0.2)
 
 if __name__=='__main__':
     main()
