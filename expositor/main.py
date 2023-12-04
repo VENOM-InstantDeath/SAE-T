@@ -5,21 +5,21 @@ import os
 from pydub import AudioSegment
 from gpiozero import Button
 from signal import pause
+from time import sleep
 
 C=0
 AUDIO=[]
 SRL = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
 
-def play():
+def play(s):
     print("Button was pressed!!")
     global C
     if C == len(AUDIO):
         C = 0
         return
-    with SRL as s:
-        s.write(b'next\n')
-        sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
-        sd.wait()
+    s.write(b'next\n')
+    sd.play(AUDIO[C]['data'], AUDIO[C]['fs'])
+    sd.wait()
     C+=1
 
 def main():
@@ -30,9 +30,10 @@ def main():
     for i in sorted(os.listdir('audio')):
         data,fs=sf.read(f'audio/{i}', dtype='float32')
         AUDIO.append({'data': data, 'fs': fs})
-    bt.when_pressed = play
     print("Ready")
-    pause()
+    with SRL as s:
+        if bt.is_pressed: play(s)
+        sleep(0.2)
 
 if __name__=='__main__':
     main()
