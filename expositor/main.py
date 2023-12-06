@@ -9,7 +9,7 @@ from time import sleep
 
 C=0
 AUDIO=[]
-SRL = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
+#SRL = serial.Serial(port='/dev/ttyACM0', baudrate=9600)
 
 def play(s):
     print("Button was pressed!!")
@@ -29,9 +29,10 @@ def main():
     for i in range(len(l)):
         N=int(l[i].split('.')[0])
         L[N]=l[i]
-    bt = Button(26)
+    #bt = Button(26)
     print("Button detected")
     for i in L:
+        print(i)
         data,fs=sf.read(f'audio/{i}', dtype='float32')
         AUDIO.append({'data': data, 'fs': fs})
     print("Ready")
