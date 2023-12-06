@@ -24,10 +24,14 @@ def play(s):
 
 def main():
     print("Program started")
-    l=os.listdir('audio');l.sort()
+    l=os.listdir('audio')
+    L = [0 for i in l]
+    for i in range(len(l)):
+        N=int(l[i].split('.')[0])
+        L[N]=l[i]
     bt = Button(26)
     print("Button detected")
-    for i in sorted(os.listdir('audio')):
+    for i in L:
         data,fs=sf.read(f'audio/{i}', dtype='float32')
         AUDIO.append({'data': data, 'fs': fs})
     print("Ready")
